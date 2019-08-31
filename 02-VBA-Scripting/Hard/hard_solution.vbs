@@ -24,7 +24,6 @@ Sub Moderate_Stock_Data()
     
     'FirstRow is a Boolean variable used to find out the first row for a ticker and storing the 
     'init stock price, ticker information
-
     Dim FirstRow As Boolean
     FirstRow = True
     
@@ -68,16 +67,33 @@ Sub Moderate_Stock_Data()
         ReptPos = 2
         Rept2Pos = 2
 
+        'Find the last row in the sheet and assign it to LastRow variable
         LastRow = Sheets(J).Cells(Rows.Count, "A").End(xlUp).Row
+        
+        'Assigining the initial Stock price for the first ticker on the sheet, for the next ones, it will
+        'be assigned after reading the first row of the ticker.
         Init_Stock_Price = Sheets(J).Cells(2, 6)
+        
+        'Iterate from Row 2 to LastRow (until the end of the sheet)
         For i = 2 To LastRow
+
+            'If current cell and the next cell are same then add the Stock Volume and
+            'go to the next row
             If Sheets(J).Cells(i, 1) = Sheets(J).Cells(i + 1, 1) Then
+
                 TotStockVolume = TotStockVolume + Sheets(J).Cells(i, 7)
+                
+                'This IF statement will be used for assigining the initial Stock price for the ticker, it will assign
+                'the Init_Stock_Price value only for the first occurence of the stock ticker.
                 If FirstRow = True Then
                   Init_Stock_Price = Sheets(J).Cells(i, 6)
                   FirstRow = False
                 End If
             Else
+                'If current cell and the next cell are not same then the current cell is the
+                'end of the data for the stock ticker, udpate the stock volume and report the data and 
+                'go to the next row. 
+                'Report the Stock Volume and the Ticker for the Ticker in current cell
                 TotStockVolume = TotStockVolume + Sheets(J).Cells(i, 7)
                 Sheets(J).Cells(ReptPos, 10) = Sheets(J).Cells(i, 1)
                 Sheets(J).Cells(ReptPos, 13) = TotStockVolume
@@ -86,16 +102,25 @@ Sub Moderate_Stock_Data()
                 Sheets(J).Cells(ReptPos, 11) = Close_Stock_Price - Init_Stock_Price
                 Sheets(J).Cells(ReptPos, 12) = (Close_Stock_Price - Init_Stock_Price) / Init_Stock_Price
 
+                'For each ticker, this IF will check the Greatest Percentage increase value with the previous 
+                'ticker and use the Percentage Increase value of the current ticker if is more than the
+                'previous ticker
                 If Sheets(J).Cells(ReptPos, 12) > Great_Per_In_Value Then
                     Great_Per_In_Value = Sheets(J).Cells(ReptPos, 12)
                     Great_Per_In_Ticker = Sheets(J).Cells(i, 1)
                 End If
 
+                'For each ticker, this IF will check the Greatest Percentage decrease value with the previous 
+                'ticker and use the Percentage decrease value of the current ticker if is more than the
+                'previous ticker
                 If Sheets(J).Cells(ReptPos, 12) < Great_Per_De_Value Then
                     Great_Per_De_Value = Sheets(J).Cells(ReptPos, 12)
                     Great_Per_De_Ticker = Sheets(J).Cells(i, 1)
                 End If
 
+                'For each ticker, this IF will check the Greatest total volume value with the previous 
+                'ticker and use the Greatest total volume of the current ticker if is more than the
+                'previous ticker
                 If TotStockVolume > Great_TotVol_value Then
                     Great_TotVol_value = TotStockVolume
                     Great_TotVol_Ticker = Sheets(J).Cells(i, 1)
@@ -107,6 +132,8 @@ Sub Moderate_Stock_Data()
                 FirstRow = True
             End If
         Next i
+        'Once all the rows are processed in the current sheet, Greatest % increase,  Greatest % decrease, and
+        'Greatest Total Volume will be reported. 
         Sheets(J).Cells(2, 15) = "Greatest % Increase"
         Sheets(J).Cells(2, 16) = Great_Per_In_Ticker
         Sheets(J).Cells(2, 17) = Great_Per_In_Value
