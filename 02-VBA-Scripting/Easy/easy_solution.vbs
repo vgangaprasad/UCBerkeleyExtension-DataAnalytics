@@ -11,7 +11,6 @@ Sub Combine()
 'Variable LastRow is used for finding the number of rows in the sheet to avoid processing rows without data
     Dim LastRow As Long
     
-    On Error Resume Next
     For J = 1 To Sheets.Count
         'Initializing TotStockVolume to 0 and this variable  will be used to 
         'store the total volume for a stock ticker
